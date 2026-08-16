@@ -12,21 +12,12 @@
 </head>
 <body>
 	<main class="sheet">
-		<p class="kicker">MOSTLAND</p>
-		<h1>Донат</h1>
-		<p class="lead" id="lead">Секунду…</p>
-		<section class="code-block" hidden id="codeBlock">
-			<p class="label">В комментарий к платежу</p>
-			<p class="code" id="codeText"></p>
-			<button type="button" id="copyBtn">Скопировать</button>
-		</section>
-		<section class="pack" hidden id="packBlock">
-			<p id="packTitle"></p>
-			<p class="sum" id="packSum"></p>
-		</section>
+		<p class="code" hidden id="codeText"></p>
+		<button type="button" hidden id="copyBtn">Скопировать</button>
+		<p hidden id="packTitle"></p>
+		<p class="sum" hidden id="packSum"></p>
 		<p class="warn" id="warn" hidden></p>
 		<iframe id="payFrame" title="оплата" hidden sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>
-		<p class="foot">Касса DonatePay. Ник в комментарий не пиши.</p>
 	</main>
 	<script src="pay.js"></script>
 </body>

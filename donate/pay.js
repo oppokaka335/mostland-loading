@@ -31,37 +31,22 @@
 		return q;
 	}
 
-	function showWarn(text) {
-		var el = $("warn");
-		el.hidden = false;
-		el.textContent = text;
-	}
-
-	function setLead(text) {
-		$("lead").textContent = text;
-	}
-
 	var q = params();
 	var pack = PACKS[q.p];
 	var code = String(q.c || "").toUpperCase().trim();
 
-	if (!pack) {
-		setLead("Ссылка пустая.");
-		showWarn("Открой оплату из игры.");
-		return;
-	}
-	if (!CODE_RE.test(code)) {
-		setLead("Кода нет.");
-		showWarn("Заново из игры, чужой текст не пройдёт.");
+	if (!pack || !CODE_RE.test(code)) {
+		$("warn").hidden = false;
+		$("warn").textContent = "Открой из игры";
 		return;
 	}
 
-	setLead("Этот код — в комментарий, если сам не встал.");
-
-	$("codeBlock").hidden = false;
+	$("codeText").hidden = false;
 	$("codeText").textContent = code;
-	$("packBlock").hidden = false;
+	$("copyBtn").hidden = false;
+	$("packTitle").hidden = false;
 	$("packTitle").textContent = pack.title;
+	$("packSum").hidden = false;
 	$("packSum").textContent = pack.min + " ₽";
 
 	$("copyBtn").addEventListener("click", function () {
@@ -70,13 +55,12 @@
 		}
 	});
 
-	var src =
+	var frame = $("payFrame");
+	frame.hidden = false;
+	frame.src =
 		WIDGET +
 		"?widget_id=" +
 		encodeURIComponent(WIDGET_ID) +
 		"&sum=" +
 		encodeURIComponent(String(pack.min));
-	var frame = $("payFrame");
-	frame.hidden = false;
-	frame.src = src;
 })();
