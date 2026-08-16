@@ -1,0 +1,150 @@
+<!-- by opka_dev (oppokaka335) -->
+<!-- https://playerok.com/profile/Oppokaka/products -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>MOSTLAND</title>
+	<style>
+		html, body {
+			margin: 0;
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+			background: #050505;
+			font-family: Arial, Helvetica, sans-serif;
+		}
+		.bg {
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			background: #050505 url("bg.jpg") center center no-repeat;
+			background-size: 100% 100%;
+		}
+		.center {
+			position: absolute;
+			left: 18%;
+			right: 18%;
+			top: 50%;
+			margin-top: 28px;
+			text-align: center;
+		}
+		.track {
+			height: 6px;
+			background: rgba(0, 0, 0, 0.62);
+			border: 1px solid rgba(255, 255, 255, 0.28);
+			overflow: hidden;
+		}
+		.fill {
+			height: 100%;
+			width: 0%;
+			background: #f3f3f3;
+		}
+		.meta {
+			margin-top: 10px;
+			color: #f0f0f0;
+			font-size: 14px;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			text-shadow: 0 1px 3px #000;
+		}
+		.file {
+			margin-top: 6px;
+			color: rgba(220, 220, 220, 0.55);
+			font-size: 12px;
+			letter-spacing: 0.04em;
+			text-shadow: 0 1px 2px #000;
+			height: 16px;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+	</style>
+</head>
+<body>
+	<div class="bg"></div>
+	<div class="center">
+		<div class="track"><div class="fill" id="fill"></div></div>
+		<div class="meta" id="pct">0%</div>
+		<div class="file" id="file"></div>
+	</div>
+	<script>
+		var total = 0;
+		var needed = 0;
+		var fill = document.getElementById("fill");
+		var pct = document.getElementById("pct");
+		var fileEl = document.getElementById("file");
+
+		function clamp(n) {
+			if (n < 0) return 0;
+			if (n > 100) return 100;
+			return n;
+		}
+
+		function tick() {
+			var p = 0;
+			if (total > 0) {
+				p = clamp(Math.floor(((total - needed) / total) * 100));
+			}
+			fill.style.width = p + "%";
+			pct.innerHTML = p + "%";
+		}
+
+		function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
+			/* карту не показываем */
+		}
+
+		function SetFilesTotal(n) {
+			total = parseInt(n, 10) || 0;
+			tick();
+		}
+
+		function SetFilesNeeded(n) {
+			needed = parseInt(n, 10) || 0;
+			tick();
+		}
+
+		function DownloadingFile(name) {
+			var s = String(name || "");
+			if (s.length > 64) {
+				s = s.slice(0, 61) + "...";
+			}
+			fileEl.innerHTML = s;
+		}
+
+		function SetStatusChanged(status) {
+			var s = String(status || "");
+			if (s && !fileEl.innerHTML) {
+				fileEl.innerHTML = s;
+			}
+			if (s === "Sending client info" || s === "Starting Lua") {
+				needed = 0;
+				if (total < 1) total = 1;
+				tick();
+			}
+		}
+
+		window.GameDetails = GameDetails;
+		window.SetFilesTotal = SetFilesTotal;
+		window.SetFilesNeeded = SetFilesNeeded;
+		window.DownloadingFile = DownloadingFile;
+		window.SetStatusChanged = SetStatusChanged;
+
+		if (location.hash === "#demo") {
+			total = 80;
+			needed = 80;
+			tick();
+			var t = setInterval(function () {
+				needed = needed - 2;
+				if (needed < 0) needed = 0;
+				DownloadingFile("addon_" + (total - needed) + ".gma");
+				tick();
+				if (needed <= 0) clearInterval(t);
+			}, 90);
+		}
+	</script>
+</body>
+</html>
