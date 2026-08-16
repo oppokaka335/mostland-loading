@@ -2,7 +2,7 @@
 	"use strict";
 
 	var PACKS = {
-		test: { min: 10, title: "Тест VIP" },
+		mini: { min: 10, title: "VIP 10 минут" },
 		week: { min: 100, title: "VIP 7 дней" },
 		month: { min: 300, title: "VIP 30 дней" },
 		life: { min: 700, title: "VIP навсегда" }
@@ -23,7 +23,9 @@
 			if (!search[i]) continue;
 			var parts = search[i].split("=");
 			var k = decodeURIComponent(parts[0] || "");
-			var v = decodeURIComponent((parts.slice(1).join("=") || "").replace(/\+/g, " "));
+			var rest = parts.slice(1).join("=");
+			if (!rest) rest = "";
+			var v = decodeURIComponent(rest.replace(/\+/g, " "));
 			if (k === "p" || k === "c") q[k] = v;
 		}
 		return q;
@@ -44,17 +46,17 @@
 	var code = String(q.c || "").toUpperCase().trim();
 
 	if (!pack) {
-		setLead("Ссылка без пакета. Откройте оплату из игры.");
-		showWarn("Параметр пакета отвергнут.");
+		setLead("Ссылка пустая.");
+		showWarn("Открой оплату из игры.");
 		return;
 	}
 	if (!CODE_RE.test(code)) {
-		setLead("Ссылка без кода MOST. Откройте оплату из игры.");
-		showWarn("Код отвергнут. Ник и чужой текст не принимаются.");
+		setLead("Кода нет.");
+		showWarn("Заново из игры, чужой текст не пройдёт.");
 		return;
 	}
 
-	setLead("Вставьте этот код в сообщение кассы, если поле пустое. Сумму сервер читает у DonatePay, не с этой страницы.");
+	setLead("Этот код — в комментарий, если сам не встал.");
 
 	$("codeBlock").hidden = false;
 	$("codeText").textContent = code;
