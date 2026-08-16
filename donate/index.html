@@ -6,18 +6,28 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="referrer" content="no-referrer">
-	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; frame-src https://widget.donatepay.eu https://donatepay.eu; child-src https://widget.donatepay.eu https://donatepay.eu; base-uri 'none'; form-action https://donatepay.eu https://widget.donatepay.eu; upgrade-insecure-requests">
-	<title>MOSTLAND</title>
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action https://donatepay.eu; upgrade-insecure-requests">
+	<title>MOSTLAND — оплата</title>
 	<link rel="stylesheet" href="pay.css">
 </head>
 <body>
 	<main class="sheet">
-		<p class="code" hidden id="codeText"></p>
-		<button type="button" hidden id="copyBtn">Скопировать</button>
-		<p hidden id="packTitle"></p>
-		<p class="sum" hidden id="packSum"></p>
+		<p class="brand">MOSTLAND</p>
 		<p class="warn" id="warn" hidden></p>
-		<iframe id="payFrame" title="оплата" hidden sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>
+		<section class="card" id="card" hidden>
+			<p class="kicker">Код в поле «Сообщение» на кассе</p>
+			<p class="code" id="codeText"></p>
+			<button type="button" id="copyBtn">Скопировать код</button>
+			<h1 id="packTitle"></h1>
+			<p class="sum" id="packSum"></p>
+			<p class="hint" id="packHint"></p>
+			<ol class="steps">
+				<li>Код уже скопирован. Вставь его в сообщение доната.</li>
+				<li>Поставь сумму лота. Если касса не пускает меньше 25 ₽ — поставь 25.</li>
+				<li>Оплати на кассе MOSTIPLAY.</li>
+			</ol>
+			<a class="pay" id="payLink" href="https://donatepay.eu/don/49286" rel="noopener">Перейти к кассе</a>
+		</section>
 	</main>
 	<script src="pay.js"></script>
 </body>

@@ -2,14 +2,12 @@
 	"use strict";
 
 	var PACKS = {
-		mini: { min: 10, title: "VIP 10 минут" },
-		week: { min: 100, title: "VIP 7 дней" },
-		month: { min: 300, title: "VIP 30 дней" },
-		life: { min: 700, title: "VIP навсегда" }
+		mini: { min: 10, title: "VIP 10 минут", hint: "Проверка кассы. Потом сам спадёт." },
+		week: { min: 100, title: "VIP 7 дней", hint: "Группа VIP и работа VIP в F4." },
+		month: { min: 300, title: "VIP 30 дней", hint: "Тот же VIP на месяц." },
+		life: { min: 700, title: "VIP навсегда", hint: "Без срока. Работа VIP в F4." }
 	};
-	var WIDGET =
-		"https://widget.donatepay.eu/widgets/page/438966ca791f356f2ba593c54b69bd786a245d0a84a6e6946db4491fdf9a74d6";
-	var WIDGET_ID = "292167";
+	var CASHIER = "https://donatepay.eu/don/49286";
 	var CODE_RE = /^MOST-[2-9A-HJ-NP-Z]{8}$/;
 
 	function $(id) {
@@ -31,36 +29,40 @@
 		return q;
 	}
 
+	function copyCode(code) {
+		if (navigator.clipboard && navigator.clipboard.writeText) {
+			navigator.clipboard.writeText(code);
+			return;
+		}
+		var node = document.createElement("textarea");
+		node.value = code;
+		document.body.appendChild(node);
+		node.select();
+		try {
+			document.execCommand("copy");
+		} catch (e) {}
+		document.body.removeChild(node);
+	}
+
 	var q = params();
 	var pack = PACKS[q.p];
 	var code = String(q.c || "").toUpperCase().trim();
 
 	if (!pack || !CODE_RE.test(code)) {
 		$("warn").hidden = false;
-		$("warn").textContent = "Открой из игры";
+		$("warn").textContent = "Открой оплату из игры: F4 → Донат → Купить.";
 		return;
 	}
 
-	$("codeText").hidden = false;
+	$("card").hidden = false;
 	$("codeText").textContent = code;
-	$("copyBtn").hidden = false;
-	$("packTitle").hidden = false;
 	$("packTitle").textContent = pack.title;
-	$("packSum").hidden = false;
 	$("packSum").textContent = pack.min + " ₽";
+	$("packHint").textContent = pack.hint;
+	$("payLink").href = CASHIER;
+	copyCode(code);
 
 	$("copyBtn").addEventListener("click", function () {
-		if (navigator.clipboard && navigator.clipboard.writeText) {
-			navigator.clipboard.writeText(code);
-		}
+		copyCode(code);
 	});
-
-	var frame = $("payFrame");
-	frame.hidden = false;
-	frame.src =
-		WIDGET +
-		"?widget_id=" +
-		encodeURIComponent(WIDGET_ID) +
-		"&sum=" +
-		encodeURIComponent(String(pack.min));
 })();
