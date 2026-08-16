@@ -138,11 +138,58 @@
 		var fill = document.getElementById("fill");
 		var pct = document.getElementById("pct");
 		var fileEl = document.getElementById("file");
+		var statusRu = {
+			"Starting Lua": "Запуск Lua",
+			"Starting Lua...": "Запуск Lua",
+			"Sending client info": "Отправка данных",
+			"Mounting Addons": "Подключение аддонов",
+			"Workshop Complete": "Мастерская готова"
+		};
 
 		function clamp(n) {
 			if (n < 0) return 0;
 			if (n > 100) return 100;
 			return n;
+		}
+
+		function setLabel(s) {
+			if (fileEl.textContent !== undefined) {
+				fileEl.textContent = s;
+			} else {
+				fileEl.innerHTML = s;
+			}
+		}
+
+		function prettyFile(raw) {
+			var s = String(raw || "");
+			s = s.replace(/^\s+|\s+$/g, "");
+			s = s.replace(/^['"]+|['"]+$/g, "");
+			s = s.replace(/^Downloading\s+/i, "");
+			s = s.replace(/\s+via Workshop$/i, "");
+			s = s.replace(/\s+is downloading$/i, "");
+			if (s.indexOf("/") !== -1) {
+				var parts = s.split("/");
+				if (parts.length > 2) {
+					s = parts.slice(-2).join("/");
+				}
+			}
+			if (s.length > 52) {
+				s = s.slice(0, 49) + "...";
+			}
+			return s;
+		}
+
+		function prettyStatus(raw) {
+			var s = String(raw || "");
+			s = s.replace(/^\s+|\s+$/g, "");
+			if (statusRu[s]) {
+				return statusRu[s];
+			}
+			return prettyFile(s);
+		}
+
+		function isDoneStatus(s) {
+			return s.indexOf("Starting Lua") === 0 || s.indexOf("Sending client info") === 0;
 		}
 
 		function tick() {
@@ -152,7 +199,11 @@
 			}
 			fill.style.webkitTransform = "scaleX(" + (p / 100) + ")";
 			fill.style.transform = "scaleX(" + (p / 100) + ")";
-			pct.innerHTML = p + "%";
+			if (pct.textContent !== undefined) {
+				pct.textContent = p + "%";
+			} else {
+				pct.innerHTML = p + "%";
+			}
 		}
 
 		function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
@@ -169,20 +220,16 @@
 			tick();
 		}
 
-		function DownloadingFile(name) {
-			var s = String(name || "");
-			if (s.length > 64) {
-				s = s.slice(0, 61) + "...";
-			}
-			fileEl.innerHTML = s;
+		function DownloadingFile(fileName) {
+			setLabel(prettyFile(fileName));
 		}
 
 		function SetStatusChanged(status) {
 			var s = String(status || "");
-			if (s && !fileEl.innerHTML) {
-				fileEl.innerHTML = s;
+			if (s) {
+				setLabel(prettyStatus(s));
 			}
-			if (s === "Sending client info" || s === "Starting Lua") {
+			if (isDoneStatus(s)) {
 				needed = 0;
 				if (total < 1) total = 1;
 				tick();
@@ -196,16 +243,33 @@
 		window.SetStatusChanged = SetStatusChanged;
 
 		if (location.hash === "#demo") {
-			total = 80;
-			needed = 80;
+			var demo = [
+				"DarkRP",
+				"SAM",
+				"gProtect",
+				"onehud",
+				"onemenu",
+				"Zero's GrowOP 2",
+				"Bitminers 2",
+				"Zero's BotNet",
+				"cSlot: Bank Breaker",
+				"Winemaking System"
+			];
+			total = demo.length;
+			needed = demo.length;
 			tick();
+			var di = 0;
 			var t = setInterval(function () {
-				needed = needed - 2;
-				if (needed < 0) needed = 0;
-				DownloadingFile("addon_" + (total - needed) + ".gma");
+				if (di >= demo.length) {
+					SetStatusChanged("Starting Lua...");
+					clearInterval(t);
+					return;
+				}
+				DownloadingFile(demo[di]);
+				needed = Math.max(0, needed - 1);
 				tick();
-				if (needed <= 0) clearInterval(t);
-			}, 90);
+				di = di + 1;
+			}, 220);
 		}
 	</script>
 </body>
