@@ -2,6 +2,7 @@
 	"use strict";
 
 	var PACKS = {
+		test: { min: 10, title: "Тест VIP" },
 		week: { min: 100, title: "VIP 7 дней" },
 		month: { min: 300, title: "VIP 30 дней" },
 		life: { min: 700, title: "VIP навсегда" }
