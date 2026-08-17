@@ -5,30 +5,23 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; frame-src https://donatepay.eu; child-src https://donatepay.eu; base-uri 'none'; form-action https://donatepay.eu; upgrade-insecure-requests">
-	<title>MOSTLAND — оплата</title>
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+	<title>MOSTLAND оплата</title>
 	<link rel="stylesheet" href="pay.css">
 </head>
 <body>
-	<main class="wrap">
+	<main class="page">
 		<p class="warn" id="warn" hidden></p>
-		<section class="layout" id="card" hidden>
-			<aside class="ticket">
-				<p class="brand">MOSTLAND</p>
-				<p class="kicker">Ты покупаешь</p>
-				<h1 id="packTitle"></h1>
-				<p class="sum" id="packSum"></p>
-				<p class="hint" id="packHint"></p>
-				<p class="kicker">В кассе уже стоит</p>
-				<p class="code" id="codeText"></p>
-				<p class="fillnote" id="fillNote"></p>
-				<button type="button" id="copyBtn">Скопировать код</button>
-				<p class="wait">После оплаты вернись в игру. VIP придёт сам, обычно до полминуты.</p>
-				<button type="button" class="ghost" id="openBtn">Открыть кассу в окне</button>
-			</aside>
-			<div class="till">
-				<iframe id="payFrame" title="Касса MOSTLAND" sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation" referrerpolicy="origin"></iframe>
-			</div>
+		<section class="box" id="card" hidden>
+			<p class="brand">MOSTLAND</p>
+			<h1 id="packTitle"></h1>
+			<p class="sum" id="packSum"></p>
+			<p class="note" id="packHint"></p>
+			<p class="code" id="codeText"></p>
+			<p class="note" id="fillNote" hidden></p>
+			<a class="pay" id="payLink" href="#" target="_blank" rel="noopener noreferrer">Оплатить</a>
+			<button type="button" id="copyBtn">Скопировать код</button>
+			<p class="foot" id="foot"></p>
 		</section>
 	</main>
 	<script src="pay.js"></script>

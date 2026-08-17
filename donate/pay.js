@@ -2,10 +2,11 @@
 	"use strict";
 
 	var PACKS = {
-		mini: { min: 10, title: "VIP 10 минут", hint: "Проверка кассы. Потом сам спадёт." },
+		mini: { min: 10, title: "VIP 10 минут", hint: "Проверка кассы. Через 10 минут спадёт." },
 		week: { min: 100, title: "VIP 7 дней", hint: "Группа VIP и работа VIP в F4." },
-		month: { min: 300, title: "VIP 30 дней", hint: "Тот же VIP на месяц." },
-		life: { min: 700, title: "VIP навсегда", hint: "Без срока. Работа VIP в F4." }
+		month: { min: 300, title: "VIP 30 дней", hint: "Тот же VIP на месяц. Срок складывается." },
+		life: { min: 700, title: "VIP навсегда", hint: "Без срока. Работа VIP в F4." },
+		unban: { min: 100, title: "Разбан", hint: "Снимает бан-комнату. VIP не даёт." }
 	};
 	var CASHIER = "https://donatepay.eu/don/49286";
 	var CASHIER_MIN = 25;
@@ -69,17 +70,13 @@
 		);
 	}
 
-	function openTill(url) {
-		window.open(url, "mostland_pay", "width=480,height=780,noopener");
-	}
-
 	var q = params();
 	var pack = PACKS[q.p];
 	var code = String(q.c || "").toUpperCase().trim();
 
 	if (!pack || !CODE_RE.test(code)) {
 		$("warn").hidden = false;
-		$("warn").textContent = "Открой оплату из игры: F4 → Донат → Купить.";
+		$("warn").textContent = "Открой оплату из игры: F4, Донат, Оплатить.";
 		return;
 	}
 
@@ -91,25 +88,25 @@
 	$("packTitle").textContent = pack.title;
 	$("packSum").textContent = pack.min + " ₽";
 	$("packHint").textContent = pack.hint;
+	$("payLink").href = url;
+	$("payLink").textContent = "Оплатить " + paySum + " ₽";
+	$("foot").textContent = "Касса откроется в новом окне. Потом зайди в игру: VIP придёт сам, в чате напишет кто купил.";
+
 	if (paySum !== pack.min) {
-		$("fillNote").textContent =
-			"Касса не берёт меньше " +
-			CASHIER_MIN +
-			" ₽. В форме уже " +
-			paySum +
-			" ₽ — этот лот всё равно выдастся.";
-	} else {
-		$("fillNote").textContent =
-			"Сумма " + paySum + " ₽ и код уже вписаны в кассу справа. Нажми Next и оплати.";
+		$("fillNote").hidden = false;
+		$("fillNote").textContent = "В кассе будет " + paySum + " ₽. Этот лот всё равно выдастся.";
 	}
 
-	$("payFrame").src = url;
 	copyCode(code);
 
 	$("copyBtn").addEventListener("click", function () {
 		copyCode(code);
+		$("copyBtn").textContent = "Код скопирован";
 	});
-	$("openBtn").addEventListener("click", function () {
-		openTill(url);
+	$("payLink").addEventListener("click", function (ev) {
+		var win = window.open(url, "mostland_pay", "width=480,height=780,noopener");
+		if (win) {
+			ev.preventDefault();
+		}
 	});
 })();
