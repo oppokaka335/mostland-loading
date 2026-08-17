@@ -26,18 +26,27 @@
 			var rest = parts.slice(1).join("=");
 			if (!rest) rest = "";
 			var v = decodeURIComponent(rest.replace(/\+/g, " "));
-			if (k === "p" || k === "c") q[k] = v;
+			if (k === "p" || k === "c" || k === "n") q[k] = v;
 		}
 		return q;
 	}
 
-	function copyCode(code) {
+	function cleanName(raw) {
+		var n = String(raw || "").replace(/[\u0000-\u001F<>"']/g, "").replace(/^\s+|\s+$/g, "");
+		if (n.length > 25) n = n.slice(0, 25);
+		if (!n) n = "Игрок";
+		return n;
+	}
+
+	function copyText(text) {
+		text = String(text || "");
+		if (!text) return;
 		if (navigator.clipboard && navigator.clipboard.writeText) {
-			navigator.clipboard.writeText(code);
+			navigator.clipboard.writeText(text);
 			return;
 		}
 		var node = document.createElement("textarea");
-		node.value = code;
+		node.value = text;
 		document.body.appendChild(node);
 		node.select();
 		try {
@@ -52,7 +61,7 @@
 		return n;
 	}
 
-	function cashierUrl(pack, code) {
+	function cashierUrl(pack, code, name) {
 		var sum = String(cashierSum(pack));
 		return (
 			CASHIER +
@@ -65,7 +74,7 @@
 			"&message=" +
 			encodeURIComponent(code) +
 			"&name=" +
-			encodeURIComponent("MOSTLAND") +
+			encodeURIComponent(name) +
 			"&currency=RUB"
 		);
 	}
@@ -73,6 +82,7 @@
 	var q = params();
 	var pack = PACKS[q.p];
 	var code = String(q.c || "").toUpperCase().trim();
+	var name = cleanName(q.n);
 
 	if (!pack || !CODE_RE.test(code)) {
 		$("warn").hidden = false;
@@ -81,29 +91,34 @@
 	}
 
 	var paySum = cashierSum(pack);
-	var url = cashierUrl(pack, code);
+	var url = cashierUrl(pack, code, name);
 
 	$("card").hidden = false;
 	$("codeText").textContent = code;
 	$("packTitle").textContent = pack.title;
 	$("packSum").textContent = pack.min + " ₽";
 	$("packHint").textContent = pack.hint;
+	if ($("payerName")) {
+		$("payerName").hidden = false;
+		$("payerName").textContent = "Имя в кассе: " + name;
+	}
 	$("payLink").href = url;
 	$("payLink").textContent = "Оплатить " + paySum + " ₽";
-	$("foot").textContent = "Касса откроется в новом окне. Потом зайди в игру: VIP придёт сам, в чате напишет кто купил.";
+	$("foot").textContent = "Касса откроется в новом окне. Имя уже в буфере, если касса всё же спросит. VIP придёт сам.";
 
 	if (paySum !== pack.min) {
 		$("fillNote").hidden = false;
 		$("fillNote").textContent = "В кассе будет " + paySum + " ₽. Этот лот всё равно выдастся.";
 	}
 
-	copyCode(code);
+	copyText(name);
 
 	$("copyBtn").addEventListener("click", function () {
-		copyCode(code);
+		copyText(code);
 		$("copyBtn").textContent = "Код скопирован";
 	});
 	$("payLink").addEventListener("click", function (ev) {
+		copyText(name);
 		var win = window.open(url, "mostland_pay", "width=480,height=780,noopener");
 		if (win) {
 			ev.preventDefault();
