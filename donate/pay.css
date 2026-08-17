@@ -7,62 +7,43 @@ html, body {
 }
 body {
 	min-height: 100vh;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 32px 20px 48px;
 	box-sizing: border-box;
+	padding: 20px;
 }
-.sheet {
-	width: min(720px, 100%);
+.wrap {
+	max-width: 1280px;
+	margin: 0 auto;
+}
+.layout {
+	display: grid;
+	grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+	gap: 20px;
+	min-height: calc(100vh - 40px);
+}
+.ticket {
+	background: #faf8f3;
+	border: 1px solid #cfc8ba;
+	padding: 28px 24px 24px;
+	box-shadow: 0 18px 40px rgba(40, 32, 18, 0.08);
 }
 .brand {
-	margin: 0 0 18px;
-	font-size: 13px;
+	margin: 0 0 22px;
+	font-size: 12px;
 	letter-spacing: 0.22em;
 	text-transform: uppercase;
 	color: #6a6458;
 }
-.card {
-	background: #faf8f3;
-	border: 1px solid #cfc8ba;
-	padding: 36px 36px 40px;
-	box-shadow: 0 18px 40px rgba(40, 32, 18, 0.08);
-}
 .kicker {
-	margin: 0 0 10px;
-	font-size: 14px;
+	margin: 18px 0 6px;
+	font-size: 13px;
 	color: #6a6458;
 }
-.code {
-	margin: 0 0 14px;
-	font-size: 40px;
-	letter-spacing: 0.04em;
-	line-height: 1.1;
-	word-break: break-all;
-}
-button,
-.pay {
-	display: inline-block;
-	border: 0;
-	cursor: pointer;
-	font: inherit;
-	text-decoration: none;
-	box-sizing: border-box;
-}
-button {
-	background: #ece8df;
-	color: #161616;
-	border: 1px solid #cfc8ba;
-	padding: 10px 16px;
-	margin-bottom: 28px;
-}
-button:hover {
-	background: #fff;
+.kicker:first-of-type {
+	margin-top: 0;
 }
 h1 {
-	margin: 0 0 8px;
-	font-size: 32px;
+	margin: 0 0 6px;
+	font-size: 30px;
 	font-weight: 600;
 	line-height: 1.15;
 }
@@ -71,32 +52,50 @@ h1 {
 	font-size: 28px;
 	color: #8a6a1e;
 }
-.hint {
-	margin: 0 0 22px;
-	font-size: 16px;
+.hint,
+.fillnote,
+.wait {
+	margin: 0 0 12px;
+	font-size: 15px;
 	line-height: 1.45;
 	color: #4a463e;
 }
-.steps {
-	margin: 0 0 28px;
-	padding-left: 20px;
-	font-size: 16px;
-	line-height: 1.5;
-	color: #2a2a2a;
+.code {
+	margin: 0 0 10px;
+	font-size: 26px;
+	letter-spacing: 0.04em;
+	word-break: break-all;
 }
-.steps li + li {
-	margin-top: 8px;
+.till {
+	background: #faf8f3;
+	border: 1px solid #cfc8ba;
+	min-height: 720px;
+	overflow: hidden;
 }
-.pay {
+#payFrame {
+	display: block;
 	width: 100%;
-	text-align: center;
-	background: #1c1c1c;
-	color: #faf8f3;
-	padding: 16px 18px;
-	font-size: 18px;
+	height: 100%;
+	min-height: 720px;
+	border: 0;
+	background: #fff;
 }
-.pay:hover {
-	background: #000;
+button {
+	display: block;
+	width: 100%;
+	border: 1px solid #cfc8ba;
+	background: #ece8df;
+	color: #161616;
+	padding: 11px 14px;
+	margin: 0 0 10px;
+	cursor: pointer;
+	font: inherit;
+}
+button:hover {
+	background: #fff;
+}
+button.ghost {
+	background: transparent;
 }
 .warn {
 	background: #faf8f3;
@@ -104,14 +103,13 @@ h1 {
 	padding: 28px;
 	font-size: 20px;
 }
-@media (max-width: 640px) {
-	.card {
-		padding: 24px 20px 28px;
+@media (max-width: 900px) {
+	.layout {
+		grid-template-columns: 1fr;
+		min-height: 0;
 	}
-	.code {
-		font-size: 28px;
-	}
-	h1 {
-		font-size: 26px;
+	.till,
+	#payFrame {
+		min-height: 640px;
 	}
 }

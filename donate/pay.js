@@ -8,6 +8,7 @@
 		life: { min: 700, title: "VIP навсегда", hint: "Без срока. Работа VIP в F4." }
 	};
 	var CASHIER = "https://donatepay.eu/don/49286";
+	var CASHIER_MIN = 25;
 	var CODE_RE = /^MOST-[2-9A-HJ-NP-Z]{8}$/;
 
 	function $(id) {
@@ -44,6 +45,34 @@
 		document.body.removeChild(node);
 	}
 
+	function cashierSum(pack) {
+		var n = Number(pack.min) || 0;
+		if (n < CASHIER_MIN) return CASHIER_MIN;
+		return n;
+	}
+
+	function cashierUrl(pack, code) {
+		var sum = String(cashierSum(pack));
+		return (
+			CASHIER +
+			"?sum=" +
+			encodeURIComponent(sum) +
+			"&amount=" +
+			encodeURIComponent(sum) +
+			"&comment=" +
+			encodeURIComponent(code) +
+			"&message=" +
+			encodeURIComponent(code) +
+			"&name=" +
+			encodeURIComponent("MOSTLAND") +
+			"&currency=RUB"
+		);
+	}
+
+	function openTill(url) {
+		window.open(url, "mostland_pay", "width=480,height=780,noopener");
+	}
+
 	var q = params();
 	var pack = PACKS[q.p];
 	var code = String(q.c || "").toUpperCase().trim();
@@ -54,15 +83,33 @@
 		return;
 	}
 
+	var paySum = cashierSum(pack);
+	var url = cashierUrl(pack, code);
+
 	$("card").hidden = false;
 	$("codeText").textContent = code;
 	$("packTitle").textContent = pack.title;
 	$("packSum").textContent = pack.min + " ₽";
 	$("packHint").textContent = pack.hint;
-	$("payLink").href = CASHIER;
+	if (paySum !== pack.min) {
+		$("fillNote").textContent =
+			"Касса не берёт меньше " +
+			CASHIER_MIN +
+			" ₽. В форме уже " +
+			paySum +
+			" ₽ — этот лот всё равно выдастся.";
+	} else {
+		$("fillNote").textContent =
+			"Сумма " + paySum + " ₽ и код уже вписаны в кассу справа. Нажми Next и оплати.";
+	}
+
+	$("payFrame").src = url;
 	copyCode(code);
 
 	$("copyBtn").addEventListener("click", function () {
 		copyCode(code);
+	});
+	$("openBtn").addEventListener("click", function () {
+		openTill(url);
 	});
 })();
