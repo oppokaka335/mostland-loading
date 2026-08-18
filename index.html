@@ -114,11 +114,31 @@
 			text-shadow: 0 1px 2px #000;
 			white-space: nowrap;
 		}
+		.nowplaying {
+			position: absolute;
+			left: 1.6%;
+			bottom: 2%;
+			max-width: 38%;
+			color: #e8e8e8;
+			font-size: 13px;
+			letter-spacing: 0.04em;
+			text-shadow: 0 1px 2px #000;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			pointer-events: none;
+		}
+		.nowplaying .k {
+			color: rgba(232, 232, 232, 0.55);
+			margin-right: 8px;
+		}
 	</style>
 </head>
 <body>
 	<div class="bg"></div>
 	<div class="scrim"></div>
+	<div class="nowplaying" id="nowplaying"><span class="k">трек</span><span id="track">-</span></div>
+	<audio id="bgm" preload="auto"></audio>
 	<div class="hud">
 		<div class="row">
 			<div class="file" id="file">Загрузка</div>
@@ -241,6 +261,66 @@
 		window.SetFilesNeeded = SetFilesNeeded;
 		window.DownloadingFile = DownloadingFile;
 		window.SetStatusChanged = SetStatusChanged;
+
+		(function music() {
+			var audio = document.getElementById("bgm");
+			var trackEl = document.getElementById("track");
+			var list = [
+				{ file: "music/night-shift.ogg", title: "Night Shift" },
+				{ file: "music/empty-lot.ogg", title: "Empty Lot" },
+				{ file: "music/service-road.ogg", title: "Service Road" }
+			];
+			var i = 0;
+
+			function setTitle(name) {
+				if (trackEl.textContent !== undefined) {
+					trackEl.textContent = name;
+				} else {
+					trackEl.innerHTML = name;
+				}
+			}
+
+			function playAt(idx) {
+				if (!audio || !list.length) return;
+				i = ((idx % list.length) + list.length) % list.length;
+				var row = list[i];
+				setTitle(row.title || row.file);
+				audio.src = row.file;
+				audio.volume = 0.42;
+				var p = audio.play();
+				if (p && p.catch) p.catch(function () {});
+			}
+
+			audio.addEventListener("ended", function () {
+				playAt(i + 1);
+			});
+
+			function boot(rows) {
+				if (rows && rows.length) list = rows;
+				playAt(0);
+			}
+
+			try {
+				var req = new XMLHttpRequest();
+				req.open("GET", "music.json", true);
+				req.onreadystatechange = function () {
+					if (req.readyState !== 4) return;
+					if (req.status >= 200 && req.status < 300 && req.responseText) {
+						try {
+							var parsed = JSON.parse(req.responseText);
+							if (parsed && parsed.length) {
+								boot(parsed);
+								return;
+							}
+						} catch (e) {}
+					}
+					boot(list);
+				};
+				req.send();
+			} catch (e) {
+				boot(list);
+			}
+		})();
 
 		if (location.hash === "#demo") {
 			var demo = [
