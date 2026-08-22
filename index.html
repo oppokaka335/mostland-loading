@@ -20,15 +20,17 @@
 			background: #ececec;
 			color: #111;
 		}
-		.bg {
+		.bg, .bg2 {
 			position: absolute;
 			left: 0;
 			top: 0;
 			width: 100%;
 			height: 100%;
-			background: #050505 url("bg.jpg?v=3") center center no-repeat;
-			background-size: 100% 100%;
+			background: #050505 center center no-repeat;
+			background-size: cover;
 		}
+		.bg2 { opacity: 0; }
+		.bg, .bg2 { -webkit-transition: opacity 1s linear; transition: opacity 1s linear; }
 		.scrim {
 			position: absolute;
 			left: 0;
@@ -135,7 +137,8 @@
 	</style>
 </head>
 <body>
-	<div class="bg"></div>
+	<div class="bg" id="bg"></div>
+	<div class="bg2" id="bg2"></div>
 	<div class="scrim"></div>
 	<div class="nowplaying" id="nowplaying"><span class="k">трек</span><span id="track">-</span></div>
 	<audio id="bgm" preload="auto"></audio>
@@ -227,7 +230,7 @@
 		}
 
 		function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-			/* карту не показываем */
+			if (window.mostlandTryMusic) window.mostlandTryMusic();
 		}
 
 		function SetFilesTotal(n) {
@@ -245,6 +248,7 @@
 		}
 
 		function SetStatusChanged(status) {
+			if (window.mostlandTryMusic) window.mostlandTryMusic();
 			var s = String(status || "");
 			if (s) {
 				setLabel(prettyStatus(s));
@@ -262,6 +266,32 @@
 		window.DownloadingFile = DownloadingFile;
 		window.SetStatusChanged = SetStatusChanged;
 
+		(function shots() {
+			var files = [
+				"shots/gmod-01.jpg?v=4",
+				"shots/gmod-02.jpg?v=4",
+				"shots/gmod-03.jpg?v=4",
+				"shots/gmod-04.jpg?v=4",
+				"shots/gmod-05.jpg?v=4"
+			];
+			var a = document.getElementById("bg");
+			var b = document.getElementById("bg2");
+			var i = 0;
+			function show(el, src) {
+				if (el) el.style.backgroundImage = "url('" + src + "')";
+			}
+			show(a, files[0]);
+			if (files.length < 2) return;
+			setInterval(function () {
+				i = (i + 1) % files.length;
+				var front = (i % 2) ? b : a;
+				var back = (i % 2) ? a : b;
+				show(front, files[i]);
+				if (front) front.style.opacity = "1";
+				if (back) back.style.opacity = "0";
+			}, 7000);
+		})();
+
 		(function music() {
 			var audio = document.getElementById("bgm");
 			var trackEl = document.getElementById("track");
@@ -271,6 +301,7 @@
 				{ file: "music/service-road.ogg", title: "Service Road" }
 			];
 			var i = 0;
+			var started = false;
 
 			function setTitle(name) {
 				if (trackEl.textContent !== undefined) {
@@ -285,24 +316,42 @@
 				i = ((idx % list.length) + list.length) % list.length;
 				var row = list[i];
 				setTitle(row.title || row.file);
-				audio.src = row.file;
-				audio.volume = 0.42;
+				if (audio.getAttribute("src") !== row.file) {
+					audio.src = row.file;
+				}
+				audio.volume = 0.55;
+				audio.muted = false;
 				var p = audio.play();
 				if (p && p.catch) p.catch(function () {});
 			}
 
+			function tryPlay() {
+				if (!audio) return;
+				if (audio.paused) {
+					playAt(i);
+				}
+			}
+			window.mostlandTryMusic = tryPlay;
+
+			audio.setAttribute("autoplay", "autoplay");
 			audio.addEventListener("ended", function () {
 				playAt(i + 1);
+			});
+			audio.addEventListener("playing", function () {
+				started = true;
 			});
 
 			function boot(rows) {
 				if (rows && rows.length) list = rows;
 				playAt(0);
+				setTimeout(tryPlay, 400);
+				setTimeout(tryPlay, 1200);
 			}
 
 			try {
 				var req = new XMLHttpRequest();
 				req.open("GET", "music.json", true);
+				req.timeout = 800;
 				req.onreadystatechange = function () {
 					if (req.readyState !== 4) return;
 					if (req.status >= 200 && req.status < 300 && req.responseText) {
@@ -316,10 +365,15 @@
 					}
 					boot(list);
 				};
+				req.ontimeout = function () { boot(list); };
 				req.send();
 			} catch (e) {
 				boot(list);
 			}
+
+			setInterval(function () {
+				if (!started || (audio && audio.paused)) tryPlay();
+			}, 1500);
 		})();
 
 		if (location.hash === "#demo") {
